@@ -189,14 +189,14 @@ namespace PONGAR
         /// <param name="img">The image to draw the cube onto</param>
         /// <param name="scale">The size of the cube</param>
         /// <param name="projection">the projection-matrix to use for converting world coordinates to screen coordinates</param>
-        public static void DrawCube(IInputOutputArray img, Matrix<float> projection, float scale = 1)
+        public static void DrawCube(IInputOutputArray img, Matrix<float> projection, float scaleX = 1, float scaleY = 1)
         {
             Matrix<float>[] worldPoints = new[]
             {
-                new Matrix<float>(new float[] { 0, 0, 0, 1 }), new Matrix<float>(new float[] { scale, 0, 0, 1 }),
-                new Matrix<float>(new float[] { scale, scale, 0, 1 }), new Matrix<float>(new float[] { 0, scale, 0, 1 }),
-                new Matrix<float>(new float[] { 0, 0, -scale, 1 }), new Matrix<float>(new float[] { scale, 0, -scale, 1 }),
-                new Matrix<float>(new float[] { scale, scale, -scale, 1 }), new Matrix<float>(new float[] { 0, scale, -scale, 1 })
+                new Matrix<float>(new float[] { 0, 0, 0, 1 }), new Matrix<float>(new float[] { scaleX, 0, 0, 1 }),
+                new Matrix<float>(new float[] { scaleX, scaleY, 0, 1 }), new Matrix<float>(new float[] { 0, scaleY, 0, 1 }),
+                new Matrix<float>(new float[] { 0, 0, -scaleX, 1 }), new Matrix<float>(new float[] { scaleX, 0, -scaleX, 1 }),
+                new Matrix<float>(new float[] { scaleX, scaleY, -scaleX, 1 }), new Matrix<float>(new float[] { 0, scaleY, -scaleX, 1 })
             };
 
             Point[] screenPoints = worldPoints

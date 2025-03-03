@@ -38,7 +38,7 @@ public class MarkerAR
 
     public MarkerAR()
     {
-        VideoCapture = new VideoCapture(1);
+        VideoCapture = new VideoCapture(0);
         UtilityAR.ReadIntrinsicsFromFile(out intrinsics, out distCoeffs);
     }
 
@@ -240,7 +240,7 @@ public class MarkerAR
                 
                     Matrix<float> worldToScreenMatrix = intrinsics * rtMatrix;
                 
-                    UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f);
+                    UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
                     return frame;
                 }
             }
