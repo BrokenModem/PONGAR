@@ -14,8 +14,10 @@ public class MarkerAR
     private Size patternSize = new Size(7, 4);
     private Matrix<float> intrinsics;
     private Matrix<float> distCoeffs;
-
+    private List<Rectangle> collisionBoxes;
+    private Rectangle[] tempCollisionBoxes;
     private Mat frame = new();
+    
     public Mat GameFrame { get; set; }
     public VideoCapture VideoCapture { get; set; }
     public bool FrameGrabbed { get; set; } = false;
@@ -59,6 +61,7 @@ public class MarkerAR
 
     public Mat Update()
     {
+        collisionBoxes = new();
         Mat localFrame = new();
         FrameGrabbed = VideoCapture.Read(localFrame);
         if (!FrameGrabbed)
@@ -240,11 +243,16 @@ public class MarkerAR
                 
                     Matrix<float> worldToScreenMatrix = intrinsics * rtMatrix;
                 
-                    UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
-                    return frame;
+                    Rectangle collisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
+                    CvInvoke.Rectangle(frame, collisionBox, new MCvScalar(255, 255, 0), 2);
+                    collisionBoxes.Add(collisionBox);
                 }
             }
         }
+        
+        tempCollisionBoxes = new Rectangle[collisionBoxes.Count];
+        collisionBoxes.CopyTo(tempCollisionBoxes);
+        
         return frame;
     }
     private static bool CompareByteMatrices(Matrix<byte> mat1, Matrix<byte> mat2)
@@ -266,6 +274,12 @@ public class MarkerAR
         }
         return true;
     }
+
+    public Rectangle[] GetArrayOfCollisionBoxes()
+    {
+        return tempCollisionBoxes;
+    }
+    
     private static void ShowWithContours(Mat frame, VectorOfVectorOfPoint listOfContours)
     {
         CvInvoke.DrawContours(frame, listOfContours, -1, new MCvScalar(255, 255, 0), 2);

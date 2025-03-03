@@ -189,7 +189,7 @@ namespace PONGAR
         /// <param name="img">The image to draw the cube onto</param>
         /// <param name="scale">The size of the cube</param>
         /// <param name="projection">the projection-matrix to use for converting world coordinates to screen coordinates</param>
-        public static void DrawCube(IInputOutputArray img, Matrix<float> projection, float scaleX = 1, float scaleY = 1)
+        public static Rectangle DrawCube(IInputOutputArray img, Matrix<float> projection, float scaleX = 1, float scaleY = 1)
         {
             Matrix<float>[] worldPoints = new[]
             {
@@ -232,7 +232,60 @@ namespace PONGAR
 
                 CvInvoke.Line(img, p1, p2, new MCvScalar(0, 0, 255), 3);
             }
+
+            Rectangle floorCollisionBox = GetFloorCollisionBox(projection, scaleX, scaleY);
+            
+            PointF floorCenter = GetCubeFloorCenter(projection, scaleX, scaleY);
+            
+            floorCollisionBox.X = (int)floorCenter.X - floorCollisionBox.Width / 2;
+            floorCollisionBox.Y = (int)floorCenter.Y - floorCollisionBox.Height / 2;
+            
+            return floorCollisionBox;
         }
+        
+        private static PointF GetCubeFloorCenter(Matrix<float> projection, float scaleX, float scaleY)
+        {
+            Matrix<float>[] worldPoints = new[]
+            {
+                new Matrix<float>(new float[] { 0, 0, 0, 1 }),
+                new Matrix<float>(new float[] { scaleX, 0, 0, 1 }),
+                new Matrix<float>(new float[] { scaleX, scaleY, 0, 1 }),
+                new Matrix<float>(new float[] { 0, scaleY, 0, 1 })
+            };
+            
+            Point[] screenPoints = worldPoints
+                .Select(x => WorldToScreen(x, projection))
+                .ToArray();
+            
+            float centerX = (float)screenPoints.Average(p => p.X);
+            float centerY = (float)screenPoints.Average(p => p.Y);
+            
+            return new Point((int)centerX, (int)centerY);
+        }
+        
+        public static Rectangle GetFloorCollisionBox(Matrix<float> projection, float scaleX = 1, float scaleY = 1)
+        {
+            float halfScaleX = scaleX / 2;
+            float halfScaleY = scaleY / 2;
+            
+            Matrix<float>[] floorPoints = new[]
+            {
+                new Matrix<float>(new float[] { -halfScaleX, -halfScaleY, 0, 1 }),
+                new Matrix<float>(new float[] {  halfScaleX, -halfScaleY, 0, 1 }),
+                new Matrix<float>(new float[] {  halfScaleX,  halfScaleY, 0, 1 }),
+                new Matrix<float>(new float[] { -halfScaleX,  halfScaleY, 0, 1 })
+            };
+            
+            Point[] screenPoints = floorPoints.Select(x => WorldToScreen(x, projection)).ToArray();
+            
+            int minX = screenPoints.Min(p => p.X);
+            int maxX = screenPoints.Max(p => p.X);
+            int minY = screenPoints.Min(p => p.Y);
+            int maxY = screenPoints.Max(p => p.Y);
+            
+            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        }
+
 
         /// <summary>
         /// Converts a homogeneous world coordinate to a screen point
