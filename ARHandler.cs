@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace PONGAR;
-public class MarkerAR
+public class ARHandler
 {
     private Size patternSize = new Size(7, 4);
     private Matrix<float> intrinsics;
@@ -36,9 +36,9 @@ public class MarkerAR
     //TIL ØVELSE 5 & 6
     Mat transformedGray = new();
     Mat transformedBinary = new();
-    private List<Matrix<byte>> knownMarker = new();
+    private MarkerHandler markerHandler = new();
 
-    public MarkerAR()
+    public ARHandler()
     {
         VideoCapture = new VideoCapture(0);
         UtilityAR.ReadIntrinsicsFromFile(out intrinsics, out distCoeffs);
@@ -74,7 +74,7 @@ public class MarkerAR
 
         CvInvoke.CvtColor(frame, gray, ColorConversion.Bgr2Gray);
         CvInvoke.Threshold(gray, binary, 0, 255, ThresholdType.Otsu);
-        //CvInvoke.Imshow("MarkerAR", frame);
+        //CvInvoke.Imshow("ARHandler", frame);
 
         // --------- #2 -------------
         CvInvoke.FindContours(binary, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
@@ -110,7 +110,7 @@ public class MarkerAR
                 return null;
 
             CvInvoke.WarpPerspective(frame, transformed, homography, new Size(300, 300));
-            //CvInvoke.Imshow("MarkerAR", transformed);
+            //CvInvoke.Imshow("ARHandler", transformed);
 
         // --------- #5 -------------
             //GreyScale
@@ -137,26 +137,6 @@ public class MarkerAR
             }
 
         // --------- #6 -------------
-        //Rotate Matrixes.
-            knownMarker =
-            [
-                new Matrix<byte>(new byte[,]
-                    {
-                        {0,0,0,0,0,0},
-                        {0,1,1,0,1,0},
-                        {0,1,1,1,0,0},
-                        {0,0,0,0,1,0},
-                        {0,0,0,0,1,0},
-                        {0,0,0,0,0,0}
-                }),
-            ];
-
-            for (int k = 0; k < 3; k++)
-            {
-                Matrix<byte> marker = knownMarker[k].Clone();
-                CvInvoke.Rotate(marker, marker, RotateFlags.Rotate90Clockwise);
-                knownMarker.Add(marker);
-            }
 
             //Prepare matrices
             Matrix<float> rotationVector = new(3, 1);
@@ -167,7 +147,7 @@ public class MarkerAR
 
             for (int m = 0; m < 3; m++)
             {
-                if (CompareByteMatrices(knownMarker[m], centerPixels))
+                if (CompareByteMatrices(markerHandler.GetRecognizableMarkers()[m], centerPixels))
                 {
                     foundMarker = true;
                     detectedIndex = m;
@@ -283,6 +263,6 @@ public class MarkerAR
     private static void ShowWithContours(Mat frame, VectorOfVectorOfPoint listOfContours)
     {
         CvInvoke.DrawContours(frame, listOfContours, -1, new MCvScalar(255, 255, 0), 2);
-        CvInvoke.Imshow("MarkerAR", frame);
+        CvInvoke.Imshow("ARHandler", frame);
     }
 }

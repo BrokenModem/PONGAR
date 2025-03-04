@@ -11,7 +11,8 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private Texture2D currentFrameTexture;
-    private MarkerAR marker;
+    private ARHandler arHandler;
+    private Ball ball;
 
     public Game1()
     {
@@ -25,14 +26,18 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        marker = new();
+        arHandler = new();
+        ball = new Ball(arHandler);
 
         // Set Window Size to Camera Size.
-        _graphics.PreferredBackBufferWidth = marker.VideoCapture.Width;
-        _graphics.PreferredBackBufferHeight = marker.VideoCapture.Height;
+        _graphics.PreferredBackBufferWidth = arHandler.VideoCapture.Width;
+        _graphics.PreferredBackBufferHeight = arHandler.VideoCapture.Height;
         _graphics.ApplyChanges();
 
-        marker.StartTask();
+        arHandler.StartTask();
+        
+        //Ball Initialize
+        ball.Initialize();
 
         base.Initialize();
     }
@@ -40,6 +45,9 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        
+        //Ball LoadContent
+        ball.LoadContent(Content);
 
         // TODO: use this.Content to load your game content here
     }
@@ -51,8 +59,11 @@ public class Game1 : Game
 
         // TODO: Add your update logic here
 
-        if (marker.FrameGrabbed && marker.GameFrame != null)
-            currentFrameTexture = ConvertFrameToTexture(GraphicsDevice, marker.GameFrame);
+        if (arHandler.FrameGrabbed && arHandler.GameFrame != null)
+            currentFrameTexture = ConvertFrameToTexture(GraphicsDevice, arHandler.GameFrame);
+        
+        //Ball Update
+        ball.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -64,18 +75,22 @@ public class Game1 : Game
         // TODO: Add your drawing code here
         _spriteBatch.Begin();
         
-        if (marker.FrameGrabbed && marker.GameFrame != null)
-            _spriteBatch.Draw(currentFrameTexture, Vector2.Zero, Color.White);   
+        if (arHandler.FrameGrabbed && arHandler.GameFrame != null)
+            _spriteBatch.Draw(currentFrameTexture, Vector2.Zero, Color.White);
+        
+        ball.Draw(_spriteBatch);
         
         _spriteBatch.End();
 
         base.Draw(gameTime);
     }
+    
+    // -----------------------------------------------------------------------------------------
 
     private void OnGameExit(object sender, ExitingEventArgs e)
     {
-        marker.IsRunning = true;
-        marker.VideoCapture.Dispose();
+        arHandler.IsRunning = true;
+        arHandler.VideoCapture.Dispose();
     }
 
     private Texture2D ConvertFrameToTexture(GraphicsDevice graphicsDevice, Mat frame)
