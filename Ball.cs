@@ -7,7 +7,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace PONGAR;
 
-public class Ball
+public class Ball(ARHandler arHandler)
 {
     private Texture2D texture;
     private float speed;
@@ -16,14 +16,8 @@ public class Ball
     private Vector2 position;
     private Rectangle collisionBox;
     private string previousCollisionTag;
-
     private float gameTimer;
-    private ARHandler arHandler;
-
-    public Ball(ARHandler arHandler)
-    {
-        this.arHandler = arHandler;
-    }
+    private readonly ARHandler arHandler = arHandler;
 
     public void Initialize()
     {
@@ -80,5 +74,6 @@ public class Ball
     private void OnCollision()
     {
         velocity.Y = -velocity.Y;
+        speedConst += 2.45f;
     }
 }
