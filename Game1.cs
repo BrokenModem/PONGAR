@@ -35,8 +35,7 @@ public class Game1 : Game
         _graphics.ApplyChanges();
 
         arHandler.StartTask();
-        
-        //Ball Initialize
+
         ball.Initialize();
 
         base.Initialize();
@@ -46,7 +45,6 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
-        //Ball LoadContent
         ball.LoadContent(Content);
 
         // TODO: use this.Content to load your game content here
@@ -62,7 +60,6 @@ public class Game1 : Game
         if (arHandler.FrameGrabbed && arHandler.GameFrame != null)
             currentFrameTexture = ConvertFrameToTexture(GraphicsDevice, arHandler.GameFrame);
         
-        //Ball Update
         ball.Update(gameTime);
 
         base.Update(gameTime);

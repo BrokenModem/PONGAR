@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.Drawing;
 using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -13,9 +11,11 @@ public class Ball
 {
     private Texture2D texture;
     private float speed;
+    private float speedConst;
     private Vector2 velocity;
     private Vector2 position;
     private Rectangle collisionBox;
+    private string previousCollisionTag;
 
     private float gameTimer;
     private ARHandler arHandler;
@@ -27,19 +27,22 @@ public class Ball
 
     public void Initialize()
     {
-        speed = 5f;
+        speedConst = 15f;
+        speed = 0f;
         velocity = new Vector2(0f, 1f);
         position = new Vector2(arHandler.VideoCapture.Width / 2, arHandler.VideoCapture.Height / 2);
     }
 
     public void LoadContent(ContentManager contentManager)
     {
-        texture = contentManager.Load<Texture2D>("Ball");
+        texture = contentManager.Load<Texture2D>("BALL");
         collisionBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
     }
 
     public void Update(GameTime gameTime)
     {
+        gameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        speed = speedConst * (gameTimer / 10 + 1);
         Move(gameTime);
         CheckCollision();
     }
@@ -62,12 +65,13 @@ public class Ball
 
     private void CheckCollision()
     {
-        Rectangle[] colliders = arHandler.GetArrayOfCollisionBoxes();
+        Collider[] colliders = arHandler.GetArrayOfCollisionBoxes();
 
         foreach (var collider in colliders)
         {
-            if (collisionBox.IntersectsWith(collider))
+            if (collisionBox.IntersectsWith(collider.Collisionbox) && collider.Tag != previousCollisionTag)
             {
+                previousCollisionTag = collider.Tag;
                 OnCollision();
             }
         }

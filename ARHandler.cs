@@ -14,8 +14,8 @@ public class ARHandler
     private Size patternSize = new Size(7, 4);
     private Matrix<float> intrinsics;
     private Matrix<float> distCoeffs;
-    private List<Rectangle> collisionBoxes;
-    private Rectangle[] tempCollisionBoxes;
+    private List<Collider> collisionBoxes;
+    private Collider[] tempCollisionBoxes;
     private Mat frame = new();
     
     public Mat GameFrame { get; set; }
@@ -40,7 +40,7 @@ public class ARHandler
 
     public ARHandler()
     {
-        VideoCapture = new VideoCapture(0);
+        VideoCapture = new VideoCapture(1);
         UtilityAR.ReadIntrinsicsFromFile(out intrinsics, out distCoeffs);
     }
 
@@ -225,12 +225,12 @@ public class ARHandler
                 
                     Rectangle collisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
                     CvInvoke.Rectangle(frame, collisionBox, new MCvScalar(255, 255, 0), 2);
-                    collisionBoxes.Add(collisionBox);
+                    collisionBoxes.Add(new Collider(collisionBox, "Player" + i));
                 }
             }
         }
         
-        tempCollisionBoxes = new Rectangle[collisionBoxes.Count];
+        tempCollisionBoxes = new Collider[collisionBoxes.Count];
         collisionBoxes.CopyTo(tempCollisionBoxes);
         
         return frame;
@@ -255,7 +255,7 @@ public class ARHandler
         return true;
     }
 
-    public Rectangle[] GetArrayOfCollisionBoxes()
+    public Collider[] GetArrayOfCollisionBoxes()
     {
         return tempCollisionBoxes;
     }
