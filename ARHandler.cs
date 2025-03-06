@@ -236,24 +236,46 @@ public class ARHandler
                         case 0:
                             Rectangle playerCollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
                             CvInvoke.Rectangle(frame, playerCollisionBox, new MCvScalar(255, 255, 0), 2);
-                            collisionBoxes.Add(new Collider(playerCollisionBox, "Player" + i));
-                            break;
-                        
+                            collisionBoxes.Add(new Collider(playerCollisionBox, "Player"));
+                        break;
+
                         case 1:
                             Matrix<float> modifiedMatrixLeft = worldToScreenMatrix.Clone();
                             Matrix<float> modifiedMatrixRight = worldToScreenMatrix.Clone();
-                            Vector2 offset = new Vector2(5000, 4000);
 
-                            modifiedMatrixLeft[0, modifiedMatrixLeft.Cols - 1] -= offset.X;
-                            modifiedMatrixRight[0, modifiedMatrixRight.Cols - 1] += offset.X;
-                            modifiedMatrixLeft[1, modifiedMatrixLeft.Cols - 1] -= offset.Y;
-                            modifiedMatrixRight[1, modifiedMatrixRight.Cols - 1] -= offset.Y;
+                            // Define offset in marker's local space
+                            Vector3 localOffsetLeft = new(-3, -5, 0);  // Left side of marker
+                            Vector3 localOffsetRight = new(3, -5, 0);   // Right side of marker
 
+                            // Extract rotation matrix from worldToScreenMatrix (assumes it's 3x4 or 4x4)
+                            Matrix<float> defferedRotationMatrix = new(3, 3);
+                            defferedRotationMatrix[0, 0] = worldToScreenMatrix[0, 0];
+                            defferedRotationMatrix[0, 1] = worldToScreenMatrix[0, 1];
+                            defferedRotationMatrix[0, 2] = worldToScreenMatrix[0, 2];
+                            defferedRotationMatrix[1, 0] = worldToScreenMatrix[1, 0];
+                            defferedRotationMatrix[1, 1] = worldToScreenMatrix[1, 1];
+                            defferedRotationMatrix[1, 2] = worldToScreenMatrix[1, 2];
+                            defferedRotationMatrix[2, 0] = worldToScreenMatrix[2, 0];
+                            defferedRotationMatrix[2, 1] = worldToScreenMatrix[2, 1];
+                            defferedRotationMatrix[2, 2] = worldToScreenMatrix[2, 2];
+
+                            // Rotate the offsets using the extracted rotation matrix
+                            Vector3 rotatedOffsetLeft = TransformOffset(defferedRotationMatrix, localOffsetLeft);
+                            Vector3 rotatedOffsetRight = TransformOffset(defferedRotationMatrix, localOffsetRight);
+
+                            // Apply the rotated offset to the translation part of the transformation matrix
+                            modifiedMatrixLeft[0, 3] += rotatedOffsetLeft.X;
+                            modifiedMatrixLeft[1, 3] += rotatedOffsetLeft.Y;
+                            modifiedMatrixLeft[2, 3] += rotatedOffsetLeft.Z;
+
+                            modifiedMatrixRight[0, 3] += rotatedOffsetRight.X;
+                            modifiedMatrixRight[1, 3] += rotatedOffsetRight.Y;
+                            modifiedMatrixRight[2, 3] += rotatedOffsetRight.Z;
                             
                             Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 1f, 10f);
                             CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(wallLeftCollisionBox, "WallLeft" + i));
-                            
+
                             Rectangle wallRightCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixRight, 1f, 10f);
                             CvInvoke.Rectangle(frame, wallRightCollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(wallRightCollisionBox, "WallRight" + i));
@@ -297,5 +319,13 @@ public class ARHandler
     {
         CvInvoke.DrawContours(frame, listOfContours, -1, new MCvScalar(255, 255, 0), 2);
         CvInvoke.Imshow("ARHandler", frame);
+    }
+    private Vector3 TransformOffset(Matrix<float> rotationMatrix, Vector3 localOffset)
+    {
+        return new Vector3(
+            rotationMatrix[0, 0] * localOffset.X + rotationMatrix[0, 1] * localOffset.Y + rotationMatrix[0, 2] * localOffset.Z,
+            rotationMatrix[1, 0] * localOffset.X + rotationMatrix[1, 1] * localOffset.Y + rotationMatrix[1, 2] * localOffset.Z,
+            rotationMatrix[2, 0] * localOffset.X + rotationMatrix[2, 1] * localOffset.Y + rotationMatrix[2, 2] * localOffset.Z
+        );
     }
 }
