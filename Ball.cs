@@ -61,19 +61,29 @@ public class Ball(ARHandler arHandler)
     {
         Collider[] colliders = arHandler.GetArrayOfCollisionBoxes();
 
+        if (colliders == null)
+            return;
+
         foreach (var collider in colliders)
         {
             if (collisionBox.IntersectsWith(collider.Collisionbox) && collider.Tag != previousCollisionTag)
             {
                 previousCollisionTag = collider.Tag;
-                OnCollision();
+                OnCollision(collider);
             }
         }
     }
 
-    private void OnCollision()
+    private void OnCollision(Collider collider)
     {
-        velocity.Y = -velocity.Y;
+        if (collider.Tag.Contains("Player"))
+        {
+            velocity.Y = -velocity.Y;
+        }
+        else if (collider.Tag.Contains("Wall"))
+        {
+            velocity.X = -velocity.X;
+        }
         speedConst += 2.45f;
     }
 }

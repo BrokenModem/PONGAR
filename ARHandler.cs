@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace PONGAR;
 public class ARHandler
@@ -40,7 +42,7 @@ public class ARHandler
 
     public ARHandler()
     {
-        VideoCapture = new VideoCapture(1);
+        VideoCapture = new VideoCapture(0);
         UtilityAR.ReadIntrinsicsFromFile(out intrinsics, out distCoeffs);
     }
 
@@ -145,7 +147,7 @@ public class ARHandler
             bool foundMarker = false;
             int detectedIndex = -1;
 
-            for (int m = 0; m < 3; m++)
+            for (int m = 0; m < markerHandler.GetRecognizableMarkers().Count; m++)
             {
                 if (CompareByteMatrices(markerHandler.GetRecognizableMarkers()[m], centerPixels))
                 {
@@ -155,10 +157,14 @@ public class ARHandler
                 }
             }
 
+            int recognizedMarkerIndex = detectedIndex / 4;
+
             if (foundMarker)
             {
                 MCvPoint3D32f[] objectPoints = new MCvPoint3D32f[4];
-
+                
+                detectedIndex %= 4;
+                
                 switch (detectedIndex)
                 {
                     case 0:
@@ -222,10 +228,37 @@ public class ARHandler
                         { rValues[2,0], rValues[2,1], rValues[2,2], tValues[2,0] }});
                 
                     Matrix<float> worldToScreenMatrix = intrinsics * rtMatrix;
-                
-                    Rectangle collisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
-                    CvInvoke.Rectangle(frame, collisionBox, new MCvScalar(255, 255, 0), 2);
-                    collisionBoxes.Add(new Collider(collisionBox, "Player" + i));
+                    
+                    //Add graphics
+
+                    switch (recognizedMarkerIndex)
+                    {
+                        case 0:
+                            Rectangle playerCollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 1f, 2f);
+                            CvInvoke.Rectangle(frame, playerCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            collisionBoxes.Add(new Collider(playerCollisionBox, "Player" + i));
+                            break;
+                        
+                        case 1:
+                            Matrix<float> modifiedMatrixLeft = worldToScreenMatrix.Clone();
+                            Matrix<float> modifiedMatrixRight = worldToScreenMatrix.Clone();
+                            Vector2 offset = new Vector2(5000, 4000);
+
+                            modifiedMatrixLeft[0, modifiedMatrixLeft.Cols - 1] -= offset.X;
+                            modifiedMatrixRight[0, modifiedMatrixRight.Cols - 1] += offset.X;
+                            modifiedMatrixLeft[1, modifiedMatrixLeft.Cols - 1] -= offset.Y;
+                            modifiedMatrixRight[1, modifiedMatrixRight.Cols - 1] -= offset.Y;
+
+                            
+                            Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 1f, 10f);
+                            CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            collisionBoxes.Add(new Collider(wallLeftCollisionBox, "WallLeft" + i));
+                            
+                            Rectangle wallRightCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixRight, 1f, 10f);
+                            CvInvoke.Rectangle(frame, wallRightCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            collisionBoxes.Add(new Collider(wallRightCollisionBox, "WallRight" + i));
+                            break;
+                    }
                 }
             }
         }

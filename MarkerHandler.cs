@@ -20,6 +20,16 @@ public class MarkerHandler
             {0,0,0,0,1,0}, 
             {0,0,0,0,0,0}
         }));
+        
+        AddMarker(new Matrix<byte>(new byte[,]
+        {
+            {0,0,0,0,0,0}, 
+            {0,0,1,1,1,0}, 
+            {0,1,0,0,1,0}, 
+            {0,1,1,0,0,0}, 
+            {0,1,1,0,1,0}, 
+            {0,0,0,0,0,0}
+        }));
     }
 
     public void AddMarker(Matrix<byte> marker)
