@@ -25,6 +25,7 @@ public class ARHandler
     public bool FrameGrabbed { get; set; } = false;
     public bool IsRunning { get; set; } = true;
     public Task readTask;
+    public Vector2 GameCenterPosition { get; set; } = Vector2.Zero;
 
     //TIL ØVELSE 1 & 2
     Mat gray = new();
@@ -271,6 +272,8 @@ public class ARHandler
                             modifiedMatrixRight[0, 3] += rotatedOffsetRight.X;
                             modifiedMatrixRight[1, 3] += rotatedOffsetRight.Y;
                             modifiedMatrixRight[2, 3] += rotatedOffsetRight.Z;
+                            
+                            GameCenterPosition = new Vector2(worldToScreenMatrix[0, 3], worldToScreenMatrix[1, 3]);
                             
                             Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 1f, 10f);
                             CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);
