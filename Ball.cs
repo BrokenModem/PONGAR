@@ -14,7 +14,7 @@ public class Ball(ARHandler arHandler)
     private float speedConst;
     private Vector2 velocity;
     private Vector2 position;
-    private Rectangle collisionBox;
+    public Rectangle collisionBox;
     private string previousCollisionTag;
     private float gameTimer;
     private readonly ARHandler arHandler = arHandler;
@@ -25,13 +25,14 @@ public class Ball(ARHandler arHandler)
         speed = 0f;
         velocity = new Vector2(0f, 1f);
         position = Vector2.Zero;
+        arHandler.GameBall = this;
     }
 
     public void LoadContent(ContentManager contentManager)
     {
-        texture = contentManager.Load<Texture2D>("BALL");
+        texture = contentManager.Load<Texture2D>("Ball");
         collisionBox = new Rectangle((int)(position.X + arHandler.GameCenterPosition.X), (int)(position.Y + arHandler.GameCenterPosition.Y), texture.Width, texture.Height);
-    }
+    }   
 
     public void Update(GameTime gameTime)
     {
@@ -68,6 +69,7 @@ public class Ball(ARHandler arHandler)
         {
             if (collisionBox.IntersectsWith(collider.Collisionbox) && collider.Tag != previousCollisionTag)
             {
+                Console.WriteLine(collider.Tag + " prev tag:" + previousCollisionTag);
                 previousCollisionTag = collider.Tag;
                 OnCollision(collider);
             }

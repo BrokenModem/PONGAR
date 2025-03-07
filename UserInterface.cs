@@ -9,14 +9,9 @@ public class UserInterface
 {
     private SpriteFont font;
     private float elapsedTime = 0;
-    private double timer = 0;
+    private double timer = 0; 
     private int playerOneScore = 0;
     private int playerTwoScore = 0;
-
-    public void Initialize()
-    {
-
-    }
 
     public void LoadContent(ContentManager content)
     {
