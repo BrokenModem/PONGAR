@@ -9,32 +9,33 @@ public class UserInterface
     private readonly Texture2D scoreboard;
     private readonly SpriteFont font;
     private int winCondition = 3;
-    private float elapsedTime;
+    private float elapsedTime = 0;
+    private int playerOneScore = 0;
+    private int playerTwoScore = 0;
 
-    public UserInterface()
-    {
-
-    }
     public void Initialize()
     {
+
     }
 
     public void LoadContent(ContentManager content)
     {
-        //LOAD scoreboard and font.
     }
 
     public void Update(GameTime gameTime)
     {
-        //Update timer.
+        elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         // Draw scoreboard, timer and font.
     }
-    public void UpdateScoreboard()
+    public void UpdateScoreboard(string tag)
     {
-        //Update the score.
+        if (tag == "Player1")
+            playerOneScore++;
+        else if( tag == "Player2")
+            playerTwoScore++;
     }
 }
