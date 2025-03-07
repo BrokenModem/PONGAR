@@ -13,6 +13,7 @@ public class Game1 : Game
     private Texture2D currentFrameTexture;
     private ARHandler arHandler;
     private Ball ball;
+    private UserInterface gameInterface;
 
     public Game1()
     {
@@ -28,6 +29,8 @@ public class Game1 : Game
     {
         arHandler = new();
         ball = new Ball(arHandler);
+        gameInterface = new UserInterface();
+
 
         // Set Window Size to Camera Size.
         _graphics.PreferredBackBufferWidth = arHandler.VideoCapture.Width;
@@ -46,6 +49,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
         ball.LoadContent(Content);
+        gameInterface.LoadContent(Content);
 
         // TODO: use this.Content to load your game content here
     }
@@ -61,6 +65,7 @@ public class Game1 : Game
             currentFrameTexture = ConvertFrameToTexture(GraphicsDevice, arHandler.GameFrame);
         
         ball.Update(gameTime);
+        gameInterface.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -76,6 +81,7 @@ public class Game1 : Game
             _spriteBatch.Draw(currentFrameTexture, Vector2.Zero, Color.White);
         
         ball.Draw(_spriteBatch);
+        gameInterface.Draw(_spriteBatch);
         
         _spriteBatch.End();
 

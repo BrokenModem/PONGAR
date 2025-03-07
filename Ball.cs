@@ -24,13 +24,13 @@ public class Ball(ARHandler arHandler)
         speedConst = 15f;
         speed = 0f;
         velocity = new Vector2(0f, 1f);
-        position = new Vector2(arHandler.VideoCapture.Width / 2, arHandler.VideoCapture.Height / 2);
+        position = Vector2.Zero;
     }
 
     public void LoadContent(ContentManager contentManager)
     {
         texture = contentManager.Load<Texture2D>("BALL");
-        collisionBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+        collisionBox = new Rectangle((int)(position.X + arHandler.GameCenterPosition.X), (int)(position.Y + arHandler.GameCenterPosition.Y), texture.Width, texture.Height);
     }
 
     public void Update(GameTime gameTime)
@@ -43,7 +43,7 @@ public class Ball(ARHandler arHandler)
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(texture, position, Color.White);
+        spriteBatch.Draw(texture, position + arHandler.GameCenterPosition, Color.White);
     }
     
     //--------------------------------------------------------------------------------------------
@@ -52,10 +52,9 @@ public class Ball(ARHandler arHandler)
     {
         velocity.Normalize();
         position += velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-        position += arHandler.GameCenterPosition;
         
-        collisionBox.X = (int)position.X;
-        collisionBox.Y = (int)position.Y;
+        collisionBox.X = (int)(position.X + arHandler.GameCenterPosition.X);
+        collisionBox.Y = (int)(position.Y + arHandler.GameCenterPosition.Y);
     }
 
     private void CheckCollision()

@@ -273,7 +273,13 @@ public class ARHandler
                             modifiedMatrixRight[1, 3] += rotatedOffsetRight.Y;
                             modifiedMatrixRight[2, 3] += rotatedOffsetRight.Z;
                             
-                            GameCenterPosition = new Vector2(worldToScreenMatrix[0, 3], worldToScreenMatrix[1, 3]);
+                            float z = worldToScreenMatrix[2, 3];
+
+                            if (z > 0)
+                            {
+                                GameCenterPosition = new Vector2(worldToScreenMatrix[0, 3], worldToScreenMatrix[1, 3]);
+                                GameCenterPosition = GameCenterPosition / z;
+                            }
                             
                             Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 1f, 10f);
                             CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);

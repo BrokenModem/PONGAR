@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,10 +7,9 @@ namespace PONGAR;
 
 public class UserInterface
 {
-    private readonly Texture2D scoreboard;
-    private readonly SpriteFont font;
-    private int winCondition = 3;
+    private SpriteFont font;
     private float elapsedTime = 0;
+    private double timer = 0;
     private int playerOneScore = 0;
     private int playerTwoScore = 0;
 
@@ -20,16 +20,19 @@ public class UserInterface
 
     public void LoadContent(ContentManager content)
     {
+        font = content.Load<SpriteFont>("GameFont");
     }
 
     public void Update(GameTime gameTime)
     {
         elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        timer = (float)Math.Round(elapsedTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        // Draw scoreboard, timer and font.
+        spriteBatch.DrawString(font, playerOneScore + " : " + playerTwoScore, new Vector2(275, 25), Color.White, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, timer.ToString(), new Vector2(300, 75), Color.White, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
     }
     public void UpdateScoreboard(string tag)
     {
