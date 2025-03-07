@@ -52,6 +52,7 @@ public class Ball(ARHandler arHandler)
     {
         velocity.Normalize();
         position += velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        position += arHandler.GameCenterPosition;
         
         collisionBox.X = (int)position.X;
         collisionBox.Y = (int)position.Y;
