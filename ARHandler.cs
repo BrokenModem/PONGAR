@@ -44,10 +44,28 @@ public class ARHandler
 
     public ARHandler()
     {
-        VideoCapture = new VideoCapture(0);
+        int activeCameraIndex = FindActiveCamera();
+        VideoCapture = new VideoCapture(activeCameraIndex);
         UtilityAR.ReadIntrinsicsFromFile(out intrinsics, out distCoeffs);
     }
+    public static int FindActiveCamera()
+    {
+        for (int i = 0; i < 10; i++) // Check first 10 indices
+        {
+            try
+            {
+                using VideoCapture capture = new(i, VideoCapture.API.Any);
+                if (capture.IsOpened)
+                    return i; // Return the first active camera index
+            }
+            catch (Exception)
+            {
 
+            }
+        }
+        System.Console.WriteLine(" NO CAMERA MAN!");
+        return -1; // No active camera
+    }
     public void StartTask()
     {
         readTask = Task.Run(() => 

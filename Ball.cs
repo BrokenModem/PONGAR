@@ -7,7 +7,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace PONGAR;
 
-public class Ball(ARHandler arHandler)
+public class Ball(ARHandler arHandler, UserInterface userInterface)
 {
     private Texture2D texture;
     private float speed;
@@ -16,15 +16,14 @@ public class Ball(ARHandler arHandler)
     private Vector2 position;
     public Rectangle collisionBox;
     private string previousCollisionTag;
+    private string lastPlayerCollisionTag;
     private float gameTimer;
     private readonly ARHandler arHandler = arHandler;
+    private readonly UserInterface gameInterface = userInterface;
 
     public void Initialize()
     {
-        speedConst = 15f;
-        speed = 0f;
-        velocity = new Vector2(0f, 1f);
-        position = Vector2.Zero;
+        ResetBall();
         arHandler.GameBall = this;
     }
 
@@ -40,6 +39,7 @@ public class Ball(ARHandler arHandler)
         speed = speedConst * (gameTimer / 10 + 1);
         Move(gameTime);
         CheckCollision();
+        CheckForGoal();
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -80,6 +80,7 @@ public class Ball(ARHandler arHandler)
     {
         if (collider.Tag.Contains("Player"))
         {
+            lastPlayerCollisionTag = collider.Tag;
             velocity.Y = -velocity.Y;
         }
         else if (collider.Tag.Contains("Wall"))
@@ -87,5 +88,36 @@ public class Ball(ARHandler arHandler)
             velocity.X = -velocity.X;
         }
         speedConst += 2.45f;
+    }
+    private void CheckForGoal()
+    {
+        if (position.Y + arHandler.GameCenterPosition.Y > arHandler.GameCenterPosition.Y + 250 
+        || position.X + arHandler.GameCenterPosition.X > arHandler.GameCenterPosition.X + 250)
+        {
+            if(!string.IsNullOrEmpty(lastPlayerCollisionTag))
+                gameInterface.UpdateScoreboard(lastPlayerCollisionTag);
+
+            ResetBall();
+        }
+        else if (position.Y + arHandler.GameCenterPosition.Y  < arHandler.GameCenterPosition.Y - 250 
+        || position.X + arHandler.GameCenterPosition.X < arHandler.GameCenterPosition.X - 250)
+        {
+            if(!string.IsNullOrEmpty(lastPlayerCollisionTag))
+                gameInterface.UpdateScoreboard(lastPlayerCollisionTag);
+                
+            ResetBall();
+        }
+    }
+    private void ResetBall()
+    {
+        Random rand = new();
+        float randomX = (float)(rand.NextDouble() * 2 - 1);
+        float randomY = (float)(rand.NextDouble() * 2 - 1);
+        speedConst = 15f;
+        speed = 0f;
+        velocity = new Vector2(randomX, randomY);
+        position = Vector2.Zero;
+        previousCollisionTag = string.Empty;
+        lastPlayerCollisionTag = string.Empty;
     }
 }

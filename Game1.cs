@@ -28,8 +28,8 @@ public class Game1 : Game
     protected override void Initialize()
     {
         arHandler = new();
-        ball = new Ball(arHandler);
         gameInterface = new UserInterface();
+        ball = new Ball(arHandler, gameInterface);
 
 
         // Set Window Size to Camera Size.

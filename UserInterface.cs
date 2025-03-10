@@ -33,7 +33,7 @@ public class UserInterface
     {
         if (tag == "Player1")
             playerOneScore++;
-        else if( tag == "Player2")
+        else if(tag == "Player2")
             playerTwoScore++;
     }
 }
