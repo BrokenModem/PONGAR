@@ -254,8 +254,8 @@ public class ARHandler
                     switch (recognizedMarkerIndex)
                     {
                         case 0:
-                            Rectangle playerCollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 0.5f, 2f);
-                            CvInvoke.Rectangle(frame, playerCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            Rectangle playerCollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 0.25f, 1f);
+                            //CvInvoke.Rectangle(frame, playerCollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(playerCollisionBox, "Player1"));
                             break;
 
@@ -264,8 +264,8 @@ public class ARHandler
                             Matrix<float> modifiedMatrixRight = worldToScreenMatrix.Clone();
 
                             // Define offset in marker's local space
-                            Vector3 localOffsetLeft = new(-3, -5, 0);  // Left side of marker
-                            Vector3 localOffsetRight = new(3, -5, 0);   // Right side of marker
+                            Vector3 localOffsetLeft = new(-2, -2f, 0);  // Left side of marker
+                            Vector3 localOffsetRight = new(3f, -2f, 0);   // Right side of marker
 
                             // Extract rotation matrix from worldToScreenMatrix (assumes it's 3x4 or 4x4)
                             Matrix<float> defferedRotationMatrix = new(3, 3);
@@ -300,18 +300,18 @@ public class ARHandler
                                 GameCenterPosition = GameCenterPosition / z;
                             }
                             
-                            Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 0.5f, 10f);
-                            CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            Rectangle wallLeftCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixLeft, 0.25f, 5f);
+                            //CvInvoke.Rectangle(frame, wallLeftCollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(wallLeftCollisionBox, "WallLeft"));
 
-                            Rectangle wallRightCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixRight, 0.5f, 10f);
-                            CvInvoke.Rectangle(frame, wallRightCollisionBox, new MCvScalar(255, 255, 0), 2);
+                            Rectangle wallRightCollisionBox = UtilityAR.DrawCube(frame, modifiedMatrixRight, 0.25f, 5f);
+                            //CvInvoke.Rectangle(frame, wallRightCollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(wallRightCollisionBox, "WallRight"));
                             break;
 
                         case 2:
-                            Rectangle player2CollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 0.5f, 2f);
-                            CvInvoke.Rectangle(frame, player2CollisionBox, new MCvScalar(255, 255, 0), 2);
+                            Rectangle player2CollisionBox = UtilityAR.DrawCube(frame, worldToScreenMatrix, 0.25f, 1f);
+                            //CvInvoke.Rectangle(frame, player2CollisionBox, new MCvScalar(255, 255, 0), 2);
                             collisionBoxes.Add(new Collider(player2CollisionBox, "Player2"));
                             break;
                     }

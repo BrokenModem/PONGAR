@@ -26,8 +26,8 @@ public class UserInterface
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.DrawString(font, playerOneScore + " : " + playerTwoScore, new Vector2(275, 25), Color.White, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
-        spriteBatch.DrawString(font, timer.ToString(), new Vector2(300, 75), Color.White, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, playerOneScore + " : " + playerTwoScore, new Vector2(275, 25), Color.Yellow, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, timer.ToString(), new Vector2(300, 75), Color.Yellow, 0f, Vector2.Zero, 3, SpriteEffects.None, 0f);
     }
     public void UpdateScoreboard(string tag)
     {

@@ -44,7 +44,7 @@ public class Ball(ARHandler arHandler, UserInterface userInterface)
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(texture, position + arHandler.GameCenterPosition, Color.White);
+        spriteBatch.Draw(texture, position + arHandler.GameCenterPosition, null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
     }
     
     //--------------------------------------------------------------------------------------------
@@ -82,12 +82,12 @@ public class Ball(ARHandler arHandler, UserInterface userInterface)
         {
             lastPlayerCollisionTag = collider.Tag;
             velocity.Y = -velocity.Y;
+            speedConst += 2.45f;
         }
         else if (collider.Tag.Contains("Wall"))
         {
             velocity.X = -velocity.X;
         }
-        speedConst += 2.45f;
     }
     private void CheckForGoal()
     {
@@ -113,7 +113,7 @@ public class Ball(ARHandler arHandler, UserInterface userInterface)
         Random rand = new();
         float randomX = (float)(rand.NextDouble() * 2 - 1);
         float randomY = (float)(rand.NextDouble() * 2 - 1);
-        speedConst = 15f;
+        speedConst = 20f;
         speed = 0f;
         velocity = new Vector2(randomX, randomY);
         position = Vector2.Zero;
