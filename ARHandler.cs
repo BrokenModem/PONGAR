@@ -19,7 +19,6 @@ public class ARHandler
     private List<Collider> collisionBoxes;
     private Collider[] tempCollisionBoxes;
     private Mat frame = new();
-    
     public Mat GameFrame { get; set; }
     public VideoCapture VideoCapture { get; set; }
     public bool FrameGrabbed { get; set; } = false;
@@ -27,17 +26,11 @@ public class ARHandler
     public Task readTask;
     public Vector2 GameCenterPosition { get; set; } = Vector2.Zero;
     public Ball GameBall { get; set; }
-
-    //TIL ØVELSE 1 & 2
     Mat gray = new();
     Mat binary = new();
     Mat hierarchy = new();
-
-    //TIL ØVELSE 3 & 4
     VectorOfVectorOfPoint contours = new();
     VectorOfVectorOfPoint correctedContours = new();
-
-    //TIL ØVELSE 5 & 6
     Mat transformedGray = new();
     Mat transformedBinary = new();
     private MarkerHandler markerHandler = new();
@@ -50,13 +43,13 @@ public class ARHandler
     }
     public static int FindActiveCamera()
     {
-        for (int i = 0; i < 10; i++) // Check first 10 indices
+        for (int i = 0; i < 10; i++)
         {
             try
             {
                 using VideoCapture capture = new(i, VideoCapture.API.Any);
                 if (capture.IsOpened)
-                    return i; // Return the first active camera index
+                    return i;
             }
             catch (Exception)
             {
@@ -64,7 +57,7 @@ public class ARHandler
             }
         }
         System.Console.WriteLine(" NO CAMERA MAN!");
-        return -1; // No active camera
+        return -1;
     }
     public void StartTask()
     {
@@ -96,13 +89,8 @@ public class ARHandler
 
         CvInvoke.CvtColor(frame, gray, ColorConversion.Bgr2Gray);
         CvInvoke.Threshold(gray, binary, 0, 255, ThresholdType.Otsu);
-        //CvInvoke.Imshow("ARHandler", frame);
 
-        // --------- #2 -------------
         CvInvoke.FindContours(binary, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-        //ShowWithContours(frame, contours);
-
-        // --------- #3 -------------
         correctedContours = new();
         for (int i = 0; i < contours.Size; i++)
         {
@@ -113,8 +101,7 @@ public class ARHandler
             if (approxContour.Size == 4)
                 correctedContours.Push(approxContour);
         }
-        
-        // --------- #4 -------------
+
         for (int i = 0; i < correctedContours.Size; i++)
         {
             PointF[] correctedPoints = [
@@ -132,16 +119,12 @@ public class ARHandler
                 return null;
 
             CvInvoke.WarpPerspective(frame, transformed, homography, new Size(300, 300));
-            //CvInvoke.Imshow("ARHandler", transformed);
 
-        // --------- #5 -------------
-            //GreyScale
+
             CvInvoke.CvtColor(transformed, transformedGray, ColorConversion.Bgr2Gray);
-        
-            //Binary Conversion
+    
             CvInvoke.Threshold(transformedGray, transformedBinary, 0, 255, ThresholdType.Otsu);
             
-            //Save pixel values
             int gridSize = 6;
             int cellSize = 300 / gridSize;
             Matrix<byte> centerPixels = new(gridSize, gridSize);
@@ -158,9 +141,6 @@ public class ARHandler
                 }
             }
 
-        // --------- #6 -------------
-
-            //Prepare matrices
             Matrix<float> rotationVector = new(3, 1);
             Matrix<float> translationVector = new(3, 1);
 
@@ -231,7 +211,12 @@ public class ARHandler
                 bool solvedPnP = false;
 
                 if (objectPoints.Length >= 4 && contourArray.Length >= 4)
-                    solvedPnP = CvInvoke.SolvePnP(objectPoints, contourArray, intrinsics, distCoeffs, rotationVector, translationVector);   
+                    solvedPnP = CvInvoke.SolvePnP(
+                        objectPoints, 
+                        contourArray, 
+                        intrinsics, distCoeffs, 
+                        rotationVector, 
+                        translationVector);   
 
                 if (solvedPnP)
                 {
@@ -248,8 +233,6 @@ public class ARHandler
                         { rValues[2,0], rValues[2,1], rValues[2,2], tValues[2,0] }});
                 
                     Matrix<float> worldToScreenMatrix = intrinsics * rtMatrix;
-                    
-                    //Add graphics
 
                     switch (recognizedMarkerIndex)
                     {
@@ -263,11 +246,9 @@ public class ARHandler
                             Matrix<float> modifiedMatrixLeft = worldToScreenMatrix.Clone();
                             Matrix<float> modifiedMatrixRight = worldToScreenMatrix.Clone();
 
-                            // Define offset in marker's local space
-                            Vector3 localOffsetLeft = new(-2, -2f, 0);  // Left side of marker
-                            Vector3 localOffsetRight = new(3f, -2f, 0);   // Right side of marker
+                            Vector3 localOffsetLeft = new(-2, -2f, 0);
+                            Vector3 localOffsetRight = new(3f, -2f, 0);
 
-                            // Extract rotation matrix from worldToScreenMatrix (assumes it's 3x4 or 4x4)
                             Matrix<float> defferedRotationMatrix = new(3, 3);
                             defferedRotationMatrix[0, 0] = worldToScreenMatrix[0, 0];
                             defferedRotationMatrix[0, 1] = worldToScreenMatrix[0, 1];
@@ -279,11 +260,9 @@ public class ARHandler
                             defferedRotationMatrix[2, 1] = worldToScreenMatrix[2, 1];
                             defferedRotationMatrix[2, 2] = worldToScreenMatrix[2, 2];
 
-                            // Rotate the offsets using the extracted rotation matrix
                             Vector3 rotatedOffsetLeft = TransformOffset(defferedRotationMatrix, localOffsetLeft);
                             Vector3 rotatedOffsetRight = TransformOffset(defferedRotationMatrix, localOffsetRight);
 
-                            // Apply the rotated offset to the translation part of the transformation matrix
                             modifiedMatrixLeft[0, 3] += rotatedOffsetLeft.X;
                             modifiedMatrixLeft[1, 3] += rotatedOffsetLeft.Y;
                             modifiedMatrixLeft[2, 3] += rotatedOffsetLeft.Z;

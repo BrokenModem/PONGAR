@@ -130,13 +130,16 @@ namespace PONGAR
 
             Size frameSize = new Size(frameWidth, frameHeight);
 
-            double reprojectionError = CvInvoke.CalibrateCamera(listOfObjectPoints.ToArray(), listOfCornerPoints.Select(x => x.ToArray()).ToArray(),
+            double reprojectionError = CvInvoke.CalibrateCamera(
+                listOfObjectPoints.ToArray(), 
+                listOfCornerPoints.Select(x => x.ToArray()).ToArray(),
                 frameSize,
                 intrinsics,
                 distCoeffs,
                 CalibType.Default,
                 new MCvTermCriteria(30, 0.1),
-                out Mat[] rVecs, out Mat[] tVecs);
+                out Mat[] rVecs, out Mat[] tVecs
+            );
 
             using FileStorage fs = new FileStorage("intrinsics.json", FileStorage.Mode.Write);
             fs.Write(intrinsics, "Intrinsics");
